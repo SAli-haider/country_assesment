@@ -36,24 +36,28 @@ class _CountrySearchState extends State<CountrySearch> {
   }
 
   Future<void> getSearchResult({String? query}) async {
-    setState(() {
-      loading = true;
-      message = '';
-    });
-
-    final response = await http.get(Uri.parse("https://restcountries.com/v3.1/name/$query"));
-
-    setState(() {
-      loading = false;
-    });
-
-    if (response.statusCode == 200) {
-      final decodedList = jsonDecode(response.body) as List<dynamic>;
+    try{
       setState(() {
-        countryList = decodedList.map((country) => Country.fromJson(country)).toList();
+        loading = true;
+        message = '';
       });
-    } else if (response.statusCode == 404) {
-      message = jsonDecode(response.body)['message'];
+
+      final response = await http.get(Uri.parse("https://restcountries.com/v3.1/name/$query"));
+
+      setState(() {
+        loading = false;
+      });
+
+      if (response.statusCode == 200) {
+        final decodedList = jsonDecode(response.body) as List<dynamic>;
+        setState(() {
+          countryList = decodedList.map((country) => Country.fromJson(country)).toList();
+        });
+      } else if (response.statusCode == 404) {
+        message = jsonDecode(response.body)['message'];
+      }
+    }catch(e,st){
+      debugPrint("exceptional error $e $st");
     }
   }
 
